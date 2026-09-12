@@ -26,11 +26,16 @@ export default function Sidebar({ docs }: { docs: DocMeta[] }) {
           <Link
             key={doc.slug}
             href={href}
-            className={`rounded px-2 py-1.5 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800 ${
+            className={`flex items-center justify-between gap-2 rounded px-2 py-1.5 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800 ${
               active ? "bg-neutral-100 font-medium dark:bg-neutral-800" : ""
             }`}
           >
-            {doc.title}
+            <span className="truncate">{doc.title}</span>
+            {doc.type !== "markdown" && (
+              <span className="shrink-0 rounded bg-neutral-200 px-1.5 py-0.5 text-[10px] font-medium uppercase text-neutral-600 dark:bg-neutral-700 dark:text-neutral-300">
+                {doc.type}
+              </span>
+            )}
           </Link>
         );
       })}

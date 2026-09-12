@@ -8,7 +8,10 @@ import rehypeStringify from "rehype-stringify";
 import { visit } from "unist-util-visit";
 import type { Root, Element } from "hast";
 
-/** Rewrites relative .md links (e.g. "./otro-doc.md#seccion") to app routes ("/docs/otro-doc#seccion"). */
+/**
+ * Rewrites relative links to other content/ files (e.g. "./otro-doc.md#seccion",
+ * "manual.pdf", "reporte.html") to app routes ("/docs/otro-doc#seccion").
+ */
 function rehypeRewriteMdLinks() {
   return (tree: Root) => {
     visit(tree, "element", (node: Element) => {
@@ -16,9 +19,9 @@ function rehypeRewriteMdLinks() {
       const href = String(node.properties.href);
       if (/^(https?:)?\/\//.test(href) || href.startsWith("mailto:")) return;
 
-      const match = href.match(/^\.?\/?([^#]+)\.md(#.*)?$/);
+      const match = href.match(/^\.?\/?([^#]+)\.(md|pdf|html?)(#.*)?$/);
       if (match) {
-        const [, slug, hash = ""] = match;
+        const [, slug, , hash = ""] = match;
         node.properties.href = `/docs/${slug}${hash}`;
       }
     });

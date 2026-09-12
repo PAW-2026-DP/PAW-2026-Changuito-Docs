@@ -7,14 +7,15 @@ Esta guía explica cómo sumar nuevos documentos al sitio y qué formato convien
 
 ## 1. Dónde va cada documento
 
-Todos los documentos viven como archivos `.md` sueltos dentro de la carpeta `content/` del repo. No se soportan subcarpetas por ahora: cada archivo de primer nivel en `content/` se convierte automáticamente en una página, en la ruta `/docs/<nombre-de-archivo>`.
+Todos los documentos viven como archivos sueltos dentro de la carpeta `content/` del repo. No se soportan subcarpetas por ahora: cada archivo de primer nivel en `content/` se convierte automáticamente en una página, en la ruta `/docs/<nombre-de-archivo>`. Se soportan tres formatos: **Markdown** (`.md`), **PDF** (`.pdf`) y **HTML** (`.html`/`.htm`) — ver la sección 5.
 
 ```
 content/
 ├── como-agregar-documentacion.md   ← este archivo
 ├── propuesta-general.md
 ├── trabajo-practico-integrador.md
-└── mejoras.md
+├── mejoras.md
+└── funcion-precio-envio.pdf
 ```
 
 **Nombre del archivo:** usá minúsculas, sin espacios ni acentos, separando palabras con guiones (`kebab-case`). Ese nombre es el que va a aparecer en la URL, así que conviene que sea corto y descriptivo (ej. `plan-de-envios.md`, no `Plan de Envíos (v2 final).md`).
@@ -65,23 +66,33 @@ La app reescribe automáticamente esos links `.md` a la ruta interna correcta (`
 
 El ancla de una sección (`#modelo-de-fees`) se genera a partir del texto del heading, en minúsculas y con guiones en vez de espacios — igual que en GitHub.
 
-## 5. Imágenes y archivos adjuntos
+## 5. Documentos en PDF o HTML
 
-Hoy la app solo procesa texto Markdown; no hay un pipeline para PDFs u otros binarios dentro de `content/`. Si necesitás referenciar una imagen:
+Además de Markdown, podés dejar directamente un `.pdf` o un `.html`/`.htm` en `content/` y la app le crea página propia (`/docs/<nombre-de-archivo>`), lo suma al índice y lo embebe en un visor:
 
-1. Colocala en `public/` (por ejemplo `public/images/diagrama.png`).
-2. Referenciala en el Markdown con una ruta absoluta: `![Diagrama](/images/diagrama.png)`.
+- **PDF**: se muestra en un visor embebido (`<iframe>`) a pantalla completa, con un link para abrirlo en una pestaña nueva o descargarlo. El título en el índice sale del nombre de archivo (ej. `funcion-precio-envio.pdf` → "Funcion Precio Envio"), así que convine usar un nombre descriptivo.
+- **HTML**: se sirve dentro de un `<iframe>` aislado (`sandbox`), para que sus propios estilos/scripts no choquen con los del sitio. El título se toma del `<title>` del documento si lo tiene; si no, del nombre de archivo.
 
-Para un PDF u otro archivo que no sea Markdown, lo más simple es convertir su contenido relevante a un `.md` nuevo (así queda buscable e integrado a la navegación) en vez de subirlo como adjunto suelto.
+En ambos casos podés linkear a ellos desde un doc Markdown igual que a otro `.md`:
+
+```md
+Ver el detalle en [Función de precio de envío](funcion-precio-envio.pdf).
+```
+
+**Limitación de búsqueda:** el buscador indexa el texto completo de los Markdown y HTML, pero de los PDF solo indexa el **título** (no hay extracción de texto del PDF todavía). Si necesitás que el contenido de un PDF sea buscable palabra por palabra, la alternativa es pasar ese contenido a un `.md`.
 
 ## 6. Búsqueda
 
-No hace falta ninguna configuración extra: el buscador indexa automáticamente el título y el texto de **todos** los documentos en `content/` en el momento del build. Con solo agregar el archivo y buildear/deployar de nuevo, el contenido nuevo ya aparece en los resultados de búsqueda.
+No hace falta ninguna configuración extra: el buscador indexa automáticamente el título y el texto de todos los documentos en `content/` en el momento del build (con la salvedad de los PDF explicada arriba). Con solo agregar el archivo y buildear/deployar de nuevo, el contenido nuevo ya aparece en los resultados de búsqueda.
 
-## 7. Resumen rápido
+## 7. Modo oscuro / claro
 
-1. Creá `content/mi-documento.md` con nombre en `kebab-case`.
-2. Agregá front-matter con `title` (y `order` si querés fijar su posición).
-3. Escribí el contenido en Markdown/GFM, con un `#`/`##` por sección.
-4. Para linkear otro doc, usá `[texto](otro-doc.md)` o `[texto](otro-doc.md#seccion)`.
+El botón de tema (arriba a la derecha, junto al buscador) alterna entre modo claro y oscuro y guarda la preferencia del usuario en el navegador (`localStorage`). Si el visitante nunca lo tocó, la app respeta el tema del sistema operativo. No requiere ninguna acción al agregar documentos: todos los estilos (`prose`, sidebar, buscador) ya soportan ambos modos.
+
+## 8. Resumen rápido
+
+1. Creá `content/mi-documento.<md|pdf|html>` con nombre en `kebab-case`.
+2. Si es Markdown, agregá front-matter con `title` (y `order` si querés fijar su posición).
+3. Escribí el contenido en Markdown/GFM, con un `#`/`##` por sección — o dejá el PDF/HTML tal cual.
+4. Para linkear otro doc, usá `[texto](otro-doc.md)`, `[texto](otro-doc.pdf)` o `[texto](otro-doc.html)`.
 5. Corré `npm run dev` para revisar cómo queda antes de commitear.

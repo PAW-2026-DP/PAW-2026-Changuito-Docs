@@ -1,6 +1,6 @@
 # Changuito Docs
 
-Aplicación web (Next.js) que centraliza la documentación del proyecto **Changuito**: permite leer los documentos Markdown desde el navegador, navegar entre ellos y buscar referencias.
+Aplicación web (Next.js) que centraliza la documentación del proyecto **Changuito**: permite leer documentos Markdown, PDF y HTML desde el navegador, navegar entre ellos y buscar referencias. Soporta modo oscuro/claro.
 
 ## Correr en local
 
@@ -13,8 +13,8 @@ Abrí [http://localhost:3000](http://localhost:3000).
 
 ## Agregar un nuevo documento
 
-1. Poné el archivo `.md` en `content/`.
-2. (Opcional) agregale front-matter para controlar el título y el orden en el índice:
+1. Poné el archivo (`.md`, `.pdf` o `.html`/`.htm`) en `content/`.
+2. Para Markdown, opcionalmente agregale front-matter para controlar el título y el orden en el índice:
 
    ```md
    ---
@@ -25,16 +25,21 @@ Abrí [http://localhost:3000](http://localhost:3000).
    # Contenido...
    ```
 
-   Si no hay `title`, se usa el primer `# Heading` del archivo o el nombre del archivo.
-3. Los links relativos entre documentos (`[texto](otro-doc.md)`) se resuelven automáticamente a `/docs/otro-doc`.
+   Si no hay `title`, se usa el primer `# Heading` del archivo (o el `<title>` para HTML), y si tampoco hay, el nombre del archivo.
+3. Los links relativos entre documentos (`[texto](otro-doc.md)`, `.pdf` o `.html`) se resuelven automáticamente a `/docs/otro-doc`.
+
+Ver `content/como-agregar-documentacion.md` (disponible también en el sitio) para la guía completa.
 
 ## Cómo funciona
 
-- `lib/docs.ts`: lee `content/*.md`, arma metadata (título, orden) y expone el índice de navegación.
-- `lib/markdown.ts`: pipeline remark/rehype que convierte Markdown a HTML, agrega anchors a los headings (`rehype-slug`) y reescribe links `.md` a rutas internas.
-- `lib/search.ts` + `components/SearchBar.tsx`: extraen texto plano de cada doc en build-time y arman un índice [FlexSearch](https://github.com/nextapps-de/flexsearch) en el cliente para búsqueda instantánea.
+- `lib/docs.ts`: lee `content/*.{md,pdf,html}`, arma metadata (título, orden, tipo) y expone el índice de navegación.
+- `lib/markdown.ts`: pipeline remark/rehype que convierte Markdown a HTML, agrega anchors a los headings (`rehype-slug`) y reescribe links `.md`/`.pdf`/`.html` a rutas internas.
+- `app/content/[...path]/route.ts`: sirve los archivos `.pdf`/`.html` de `content/` con el `Content-Type` correcto, para embeberlos en un `<iframe>`.
+- `components/PdfViewer.tsx` / `components/HtmlViewer.tsx`: visores embebidos para PDF y HTML (el HTML se sandboxea para aislar sus estilos/scripts).
+- `lib/search.ts` + `components/SearchBar.tsx`: extraen texto plano de cada doc en build-time (Markdown y HTML; solo el título en el caso de PDF) y arman un índice [FlexSearch](https://github.com/nextapps-de/flexsearch) en el cliente para búsqueda instantánea.
 - `components/Sidebar.tsx`: navegación lateral (colapsable en mobile) con todos los documentos.
-- `app/docs/[slug]/page.tsx`: renderiza cada documento como página estática.
+- `components/ThemeToggle.tsx`: toggle de modo oscuro/claro persistido en `localStorage`, con detección de la preferencia del sistema y sin flash de tema incorrecto al cargar.
+- `app/docs/[slug]/page.tsx`: renderiza cada documento según su tipo (Markdown, PDF o HTML).
 
 ## Deploy
 
