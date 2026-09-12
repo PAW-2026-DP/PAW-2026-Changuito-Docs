@@ -392,5 +392,5 @@ A esto se suma que el despliegue de PHP es sencillo en cualquier hosting compart
 
 Sobre once semanas de cursada restantes, el trabajo se distribuye entre los tres integrantes del equipo, con seguimiento de tareas y tiempos por entrega.
 
-[aquí insertar referencia a tablero de gestión de tareas y tiempos]
+https://linear.app/unlu-juan/project/changuito-4c7ed94f83ec/overview 
 </content>
