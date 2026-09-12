@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Changuito — Modelo de Negocio</title>
+<style>
+  :root{
+    --bg:#0f1420;
+    --bg-soft:#161d2e;
+    --card:#1b2338;
+    --border:#2a3350;
+    --text:#eef1f8;
+    --text-dim:#9aa4bf;
+    --accent:#5eead4;
+    --accent-2:#a78bfa;
+    --accent-3:#fbbf24;
+    --danger:#fb7185;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0;
+    height:100%;
+    background:var(--bg);
+    color:var(--text);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    overflow:hidden;
+  }
+  #deck{
+    position:relative;
+    height:100vh;
+    width:100vw;
+    display:flex;
+    align-items:stretch;
+    justify-content:stretch;
+  }
+  .slide{
+    position:absolute;
+    inset:0;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding:6vh 8vw;
+    opacity:0;
+    transform:translateX(24px);
+    transition:opacity .35s ease, transform .35s ease;
+    pointer-events:none;
+    overflow-y:auto;
+  }
+  .slide.active{
+    opacity:1;
+    transform:translateX(0);
+    pointer-events:auto;
+  }
+  .kicker{
+    text-transform:uppercase;
+    letter-spacing:.14em;
+    font-size:.75rem;
+    font-weight:700;
+    color:var(--accent);
+    margin:0 0 .75rem;
+  }
+  h1{
+    font-size:clamp(1.8rem, 4vw, 3rem);
+    line-height:1.15;
+    margin:0 0 .6em;
+    letter-spacing:-.01em;
+  }
+  h1 em{
+    font-style:normal;
+    color:var(--accent);
+  }
+  h2.section-title{
+    font-size:clamp(1.4rem, 3vw, 2rem);
+    margin:0 0 1.2em;
+  }
+  p.lead{
+    font-size:clamp(1rem, 1.6vw, 1.25rem);
+    color:var(--text-dim);
+    max-width:60ch;
+    line-height:1.6;
+  }
+  .grid{
+    display:grid;
+    gap:1rem;
+    margin-top:1.4rem;
+  }
+  .grid.cols-2{grid-template-columns:repeat(2,minmax(0,1fr));}
+  .grid.cols-3{grid-template-columns:repeat(3,minmax(0,1fr));}
+  .grid.cols-4{grid-template-columns:repeat(4,minmax(0,1fr));}
+  @media (max-width:820px){
+    .grid.cols-2,.grid.cols-3,.grid.cols-4{grid-template-columns:1fr;}
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:1.1rem 1.25rem;
+  }
+  .card h3{
+    margin:0 0 .4rem;
+    font-size:1.05rem;
+    display:flex;
+    align-items:center;
+    gap:.5rem;
+  }
+  .card p{
+    margin:0;
+    color:var(--text-dim);
+    font-size:.92rem;
+    line-height:1.55;
+  }
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:1.9rem;
+    height:1.9rem;
+    border-radius:50%;
+    font-size:.95rem;
+    flex-shrink:0;
+  }
+  .badge.teal{background:rgba(94,234,212,.15);color:var(--accent);}
+  .badge.violet{background:rgba(167,139,250,.15);color:var(--accent-2);}
+  .badge.amber{background:rgba(251,191,36,.15);color:var(--accent-3);}
+  .badge.rose{background:rgba(251,113,133,.15);color:var(--danger);}
+
+  .formula-box{
+    margin-top:1.6rem;
+    background:var(--bg-soft);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:1.4rem 1.6rem;
+    display:flex;
+    flex-wrap:wrap;
+    gap:2rem;
+    align-items:center;
+  }
+  .formula{
+    font-family:"Cambria Math",Cambria,Georgia,serif;
+    font-size:clamp(1.3rem,3vw,2rem);
+    color:var(--accent);
+    white-space:nowrap;
+  }
+  .formula-legend{
+    display:flex;
+    flex-direction:column;
+    gap:.35rem;
+    font-size:.88rem;
+    color:var(--text-dim);
+  }
+  .formula-legend b{color:var(--text);}
+
+  table.pricing{
+    margin-top:1.4rem;
+    border-collapse:collapse;
+    width:100%;
+    max-width:520px;
+    font-size:.92rem;
+  }
+  table.pricing th, table.pricing td{
+    text-align:left;
+    padding:.5rem .8rem;
+    border-bottom:1px solid var(--border);
+  }
+  table.pricing th{color:var(--text-dim);font-weight:600;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;}
+  table.pricing tr:last-child td{border-bottom:none;}
+  table.pricing td.hot{color:var(--danger);font-weight:700;}
+  table.pricing td.ok{color:var(--accent);font-weight:700;}
+
+  .flow{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:.6rem;
+    margin-top:1.6rem;
+  }
+  .flow .step{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:.6rem 1rem;
+    font-size:.9rem;
+    white-space:nowrap;
+  }
+  .flow .arrow{color:var(--text-dim);}
+
+  .tag-row{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1rem;}
+  .tag{
+    background:rgba(255,255,255,.06);
+    border:1px solid var(--border);
+    border-radius:999px;
+    padding:.3rem .8rem;
+    font-size:.8rem;
+    color:var(--text-dim);
+  }
+
+  .actors{display:flex;gap:1rem;flex-wrap:wrap;margin-top:1.6rem;}
+  .actor{
+    flex:1 1 200px;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:1.1rem;
+  }
+  .actor .emoji{font-size:1.6rem;}
+  .actor h3{margin:.5rem 0 .3rem;font-size:1.05rem;}
+  .actor p{margin:0;color:var(--text-dim);font-size:.88rem;line-height:1.5;}
+
+  .closing{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:.4rem;
+  }
+  .closing .big{
+    font-size:clamp(1.6rem,3.4vw,2.6rem);
+    font-weight:700;
+  }
+
+  /* chrome: progress + controls + counter */
+  #progress{
+    position:fixed;
+    top:0; left:0;
+    height:3px;
+    background:linear-gradient(90deg,var(--accent),var(--accent-2));
+    width:0%;
+    transition:width .35s ease;
+    z-index:20;
+  }
+  #controls{
+    position:fixed;
+    bottom:1.4rem;
+    right:1.6rem;
+    display:flex;
+    gap:.6rem;
+    z-index:20;
+  }
+  #counter{
+    position:fixed;
+    bottom:1.6rem;
+    left:1.8rem;
+    color:var(--text-dim);
+    font-size:.85rem;
+    font-variant-numeric:tabular-nums;
+    z-index:20;
+  }
+  button.nav{
+    background:var(--card);
+    border:1px solid var(--border);
+    color:var(--text);
+    width:2.6rem;
+    height:2.6rem;
+    border-radius:50%;
+    cursor:pointer;
+    font-size:1.1rem;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    transition:background .15s ease, transform .1s ease;
+  }
+  button.nav:hover{background:var(--bg-soft);}
+  button.nav:active{transform:scale(.94);}
+  button.nav:disabled{opacity:.3;cursor:default;}
+
+  ::-webkit-scrollbar{width:8px;}
+  ::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+<div id="deck">
+
+  <!-- 1 -->
+  <section class="slide">
+    <p class="kicker">Changuito</p>
+    <h1>El súper que <em>compara</em> el súper<br/>por vos</h1>
+    <p class="lead">Una lista de compras, todos los precios comparados, y un pedido que puede llegar armado desde varios comercios a la vez. Este es el modelo de negocio detrás de la propuesta funcional.</p>
+    <div class="tag-row">
+      <span class="tag">Marketplace multi-comercio</span>
+      <span class="tag">Envío a domicilio</span>
+      <span class="tag">Optimizador de compra</span>
+    </div>
+  </section>
+
+  <!-- 2: problema -->
+  <section class="slide">
+    <p class="kicker">El problema</p>
+    <h2 class="section-title">Ahorrar comparando precios hoy es <em style="color:var(--danger);font-style:normal;">inviable</em></h2>
+    <div class="grid cols-3">
+      <div class="card">
+        <h3><span class="badge rose">1</span> Precios dispersos</h3>
+        <p>Un mismo producto varía de precio entre cadenas, y no de forma uniforme: una es más barata en lácteos, otra en limpieza.</p>
+      </div>
+      <div class="card">
+        <h3><span class="badge rose">2</span> Comparar es manual</h3>
+        <p>La única forma de aprovechar la diferencia es comparar producto por producto o recorrer varios locales físicamente.</p>
+      </div>
+      <div class="card">
+        <h3><span class="badge rose">3</span> Envío múltiple, ¿conviene?</h3>
+        <p>Comprar en más de un comercio suma costo de envío por cada origen — y no siempre es obvio si el ahorro lo justifica.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3: solucion -->
+  <section class="slide">
+    <p class="kicker">La solución</p>
+    <h2 class="section-title">Changuito resuelve tres cosas por la lista completa</h2>
+    <div class="flow">
+      <div class="step">📝 Lista de compras</div>
+      <span class="arrow">→</span>
+      <div class="step">💰 Calcula costo por súper</div>
+      <span class="arrow">→</span>
+      <div class="step">⚖️ Evalúa si dividir conviene</div>
+      <span class="arrow">→</span>
+      <div class="step">🛒 Ejecuta el pedido y coordina el envío</div>
+    </div>
+    <p class="lead" style="margin-top:1.6rem;">El sistema recomienda, pero nunca decide por el usuario: siempre puede comprar como prefiera, desde la misma pantalla.</p>
+  </section>
+
+  <!-- 4: actores -->
+  <section class="slide">
+    <p class="kicker">Actores</p>
+    <h2 class="section-title">Cuatro roles, un mismo sistema</h2>
+    <div class="actors">
+      <div class="actor"><div class="emoji">🧑‍🛒</div><h3>Cliente</h3><p>Arma su lista, ejecuta el optimizador y sigue su pedido.</p></div>
+      <div class="actor"><div class="emoji">🏬</div><h3>Supermercado</h3><p>Administra catálogo, precios y stock; prepara pedidos.</p></div>
+      <div class="actor"><div class="emoji">🛵</div><h3>Repartidor</h3><p>Retira en cada comercio y entrega en destino.</p></div>
+      <div class="actor"><div class="emoji">🛠️</div><h3>Administrador</h3><p>Da de alta comercios, zonas y gestiona usuarios.</p></div>
+    </div>
+  </section>
+
+  <!-- 5: integracion comercios -->
+  <section class="slide">
+    <p class="kicker">Cómo entran los datos</p>
+    <h2 class="section-title">Sin scraping: cada súper carga su propio catálogo</h2>
+    <p class="lead">No todos los comercios tienen la misma capacidad técnica, así que hay tres modalidades de integración, de menor a mayor sofisticación.</p>
+    <div class="grid cols-3">
+      <div class="card">
+        <h3><span class="badge teal">1</span> Planilla estándar</h3>
+        <p>Formato fijo entregado por la plataforma. Ideal para comercios chicos sin sistemas propios.</p>
+      </div>
+      <div class="card">
+        <h3><span class="badge violet">2</span> Mapeo de formato</h3>
+        <p>El súper exporta con su propio formato; la plataforma aprende una vez cómo traducirlo.</p>
+      </div>
+      <div class="card">
+        <h3><span class="badge amber">3</span> Integración directa</h3>
+        <p>Carga inicial masiva + notificación de cambios en tiempo real vía API, para comercios con desarrollo propio.</p>
+      </div>
+    </div>
+    <p class="lead" style="margin-top:1.4rem;">El acuerdo de adhesión define de antemano cómo se amortiguan los costos si un precio desactualizado rompe una compra ya confirmada.</p>
+  </section>
+
+  <!-- 6: motor de optimizacion + radios -->
+  <section class="slide">
+    <p class="kicker">El motor de optimización</p>
+    <h2 class="section-title">El sistema sugiere, el usuario decide</h2>
+    <div class="grid cols-2">
+      <div class="card">
+        <h3><span class="badge teal">◎</span> Sin límite de comercios</h3>
+        <p>Se puede dividir la compra entre tantos súpers como se quiera; la recomendación es siempre informativa.</p>
+      </div>
+      <div class="card">
+        <h3><span class="badge violet">📍</span> Radios de cobertura</h3>
+        <p>Un radio mínimo y máximo define qué comercios compiten por una lista — y el mismo radio decide qué repartidores son elegibles para el pedido.</p>
+      </div>
+      <div class="card">
+        <h3><span class="badge amber">🚫</span> Tratamiento de faltantes</h3>
+        <p>Excluir, sugerir sustituto o descartar la combinación, según configure el usuario.</p>
+      </div>
+      <div class="card">
+        <h3><span class="badge rose">⚠️</span> Recargo por ineficiencia</h3>
+        <p>Si el usuario elige una combinación más cara que la recomendada, ve el recargo antes de confirmar.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7: formula de envio -->
+  <section class="slide">
+    <p class="kicker">El corazón del costo logístico</p>
+    <h2 class="section-title">Dividir la compra sale cada vez más caro, a propósito</h2>
+    <div class="formula-box">
+      <div class="formula">P(n) = P₀ + k·(n&minus;1)<sup>2.5</sup></div>
+      <div class="formula-legend">
+        <div><b>P(n)</b> — precio de envío según cantidad de comercios</div>
+        <div><b>P₀</b> — precio base del envío con 1 solo comercio</div>
+        <div><b>n</b> — cantidad de comercios en la compra</div>
+        <div><b>k</b> — coeficiente de ajuste (varía según tamaño de envío)</div>
+      </div>
+    </div>
+    <table class="pricing">
+      <thead><tr><th>Comercios</th><th>Precio de ejemplo</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td class="ok">$1.000</td></tr>
+        <tr><td>2</td><td class="ok">$1.500</td></tr>
+        <tr><td>3</td><td>$3.828</td></tr>
+        <tr><td>4</td><td class="hot">$8.794</td></tr>
+        <tr><td>6</td><td class="hot">$23.361</td></tr>
+      </tbody>
+    </table>
+    <p class="lead" style="margin-top:1rem;">1 o 2 comercios cuestan poco, 3 ya es un salto, y de 4 en adelante crece fuerte — sin necesidad de reglas de distancia adicionales. Además, <b style="color:var(--text)">P₀</b> y <b style="color:var(--text)">k</b> cambian según el envío sea pequeño, mediano o grande.</p>
+  </section>
+
+  <!-- 8: modelo de ingresos overview -->
+  <section class="slide">
+    <p class="kicker">Modelo de negocio</p>
+    <h2 class="section-title">Cuatro fuentes de ingreso, no una sola</h2>
+    <div class="grid cols-4">
+      <div class="card"><h3><span class="badge teal">💳</span> Premium</h3><p>Suscripción recurrente del cliente: envío gratis hasta 2 locales por nivel, sin publicidad, prioridad de repartidor.</p></div>
+      <div class="card"><h3><span class="badge violet">🏬</span> Comisión</h3><p>Fee bajo sobre el total de venta al supermercado — apuesta a volumen, no a comisión alta.</p></div>
+      <div class="card"><h3><span class="badge amber">⚠️</span> Recargo</h3><p>Cuando el usuario elige una combinación menos eficiente que la recomendada, paga la diferencia real de logística.</p></div>
+      <div class="card"><h3><span class="badge rose">📣</span> Publicidad</h3><p>Solo supermercados y marcas de producto — nunca terceros ajenos al rubro.</p></div>
+    </div>
+    <p class="lead" style="margin-top:1.4rem;">La combinación busca sostener el negocio aun con una base grande de usuarios que nunca pagan suscripción.</p>
+  </section>
+
+  <!-- 9: niveles -->
+  <section class="slide">
+    <p class="kicker">El mecanismo transversal</p>
+    <h2 class="section-title">Niveles: el motor de todos los beneficios</h2>
+    <div class="grid cols-2">
+      <div class="card">
+        <h3><span class="badge teal">🧑‍🛒</span> Nivel de cliente</h3>
+        <p>Sube por compras seguidas y puntos acumulados. Determina hasta cuánto se bonifica el envío en Premium y qué tan rápido se acumulan puntos (sin cashback).</p>
+      </div>
+      <div class="card">
+        <h3><span class="badge violet">🏬</span> Nivel de supermercado</h3>
+        <p>Sube por catálogo siempre actualizado y buen cumplimiento de preparación. Reduce la comisión y mejora el posicionamiento orgánico en búsquedas.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10: publicidad vs promos + busqueda -->
+  <section class="slide">
+    <p class="kicker">Publicidad, con reglas claras</p>
+    <h2 class="section-title">Publicidad ≠ Promoción, y la búsqueda no se vende del todo</h2>
+    <div class="grid cols-2">
+      <div class="card">
+        <h3><span class="badge rose">📣</span> Publicidad</h3>
+        <p>Espacio pago para destacar marca. Premium <b style="color:var(--text)">no</b> la ve. Nunca de terceros ajenos al rubro.</p>
+      </div>
+      <div class="card">
+        <h3><span class="badge teal">🏷️</span> Promoción</h3>
+        <p>Descuento real sobre productos. Premium <b style="color:var(--text)">sí</b> la ve — aporta valor a la decisión de compra.</p>
+      </div>
+    </div>
+    <div class="formula-box" style="margin-top:1.4rem;">
+      <div class="formula" style="font-size:1.1rem;">50% pago · 50% mérito</div>
+      <div class="formula-legend">
+        <div>La mitad de una lista de sugerencias se vende (compiten los grandes súpers).</div>
+        <div>La otra mitad es orgánica: prioriza a quien actualiza catálogo con más frecuencia.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11: incentivos por captacion temprana -->
+  <section class="slide">
+    <p class="kicker">Crecimiento del lado del comercio</p>
+    <h2 class="section-title">Captar comercios es una carrera contra la red de contactos</h2>
+    <p class="lead">El mayor riesgo de negocio no es técnico: es que el súper que sale mal parado en la comparación no tenga incentivo para sumarse.</p>
+    <div class="grid cols-3">
+      <div class="card"><h3><span class="badge teal">🎁</span> Integración temprana</h3><p>Primeros N meses con comisión reducida o exposición destacada sin costo.</p></div>
+      <div class="card"><h3><span class="badge violet">📈</span> Canal digital nuevo</h3><p>Vender online sin invertir en e-commerce propio, sobre todo para Modalidad 1 y 2.</p></div>
+      <div class="card"><h3><span class="badge amber">🏅</span> Condiciones por nivel</h3><p>Mejor comisión y mejor posicionamiento orgánico con buen desempeño sostenido.</p></div>
+    </div>
+  </section>
+
+  <!-- 12: cierre -->
+  <section class="slide">
+    <p class="kicker">En síntesis</p>
+    <div class="closing">
+      <div class="big">Comparar precios deja de ser<br/>trabajo manual del cliente.</div>
+      <p class="lead" style="margin-top:.6rem;">El negocio se sostiene con una base free financiada por publicidad, una capa Premium por niveles, comisión baja pero de volumen a los comercios, y un recargo que solo aparece cuando el usuario elige activamente lo menos eficiente.</p>
+    </div>
+    <div class="tag-row">
+      <span class="tag">Ver Propuesta General para el detalle funcional completo</span>
+    </div>
+  </section>
+
+</div>
+
+<button class="nav" id="prevBtn" style="position:fixed;bottom:1.4rem;right:5rem;">‹</button>
+<button class="nav" id="nextBtn" style="position:fixed;bottom:1.4rem;right:1.6rem;">›</button>
+<div id="counter">1 / 12</div>
+
+<script>
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const total = slides.length;
+  let idx = 0;
+
+  function render(){
+    slides.forEach((s, i) => s.classList.toggle('active', i === idx));
+    document.getElementById('progress').style.width = ((idx + 1) / total * 100) + '%';
+    document.getElementById('counter').textContent = (idx + 1) + ' / ' + total;
+    document.getElementById('prevBtn').disabled = idx === 0;
+    document.getElementById('nextBtn').disabled = idx === total - 1;
+    if (location.hash !== '#' + (idx + 1)) {
+      history.replaceState(null, '', '#' + (idx + 1));
+    }
+  }
+
+  function go(delta){
+    idx = Math.min(total - 1, Math.max(0, idx + delta));
+    render();
+  }
+
+  document.getElementById('prevBtn').addEventListener('click', () => go(-1));
+  document.getElementById('nextBtn').addEventListener('click', () => go(1));
+
+  window.addEventListener('keydown', (e) => {
+    if (['ArrowRight','ArrowDown','PageDown',' '].includes(e.key)) { go(1); e.preventDefault(); }
+    if (['ArrowLeft','ArrowUp','PageUp'].includes(e.key)) { go(-1); e.preventDefault(); }
+  });
+
+  let touchStartX = null;
+  window.addEventListener('touchstart', (e) => { touchStartX = e.touches[0].clientX; });
+  window.addEventListener('touchend', (e) => {
+    if (touchStartX === null) return;
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
+    touchStartX = null;
+  });
+
+  const initial = parseInt((location.hash || '').replace('#',''), 10);
+  if (!Number.isNaN(initial) && initial >= 1 && initial <= total) idx = initial - 1;
+  render();
+</script>
+
+</body>
+</html>

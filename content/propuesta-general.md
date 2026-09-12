@@ -157,6 +157,10 @@ Restricciones: exige que el supermercado cuente con capacidad técnica propia pa
 
 Independientemente de la modalidad elegida, la plataforma es la única fuente de verdad de cara al cliente final: los precios y el stock que ve el cliente al armar su lista de compra son siempre los últimos recibidos del supermercado, sin importar por qué vía llegaron. Ante una compra confirmada con datos que luego resultan desactualizados por demora del supermercado en informar un cambio, se respeta el precio mostrado al momento de la confirmación de compra.
 
+El acuerdo de adhesión entre la plataforma y cada supermercado debe fijar de antemano términos y condiciones sobre qué ocurre cuando un precio o stock desactualizado del comercio provoca un problema en una compra ya confirmada (por ejemplo, un producto que se muestra disponible pero no lo está al momento del retiro): quién amortigua la diferencia de costo o el reclamo del cliente, y bajo qué condiciones. Esto evita que la disputa se resuelva caso por caso.
+
+Para incentivar la adhesión temprana de comercios, se contemplan beneficios durante los primeros N meses desde la integración (por ejemplo, comisión reducida o exposición destacada sin costo), a definir junto con el resto de beneficios por actor (ver [7. Beneficios e incentivos por actor](#7.-beneficios-e-incentivos-por-actor)).
+
 ---
 
 ## 4\. El motor de optimización {#4.-el-motor-de-optimización}
@@ -172,6 +176,9 @@ Puntos clave a nivel funcional:
   * Excluir el producto y advertirlo en el resultado.
   * Sugerir un producto sustituto de la misma categoría.
   * Descartar la combinación si la cantidad de faltantes supera un umbral.
+* **Radios de cobertura:** se definen un radio mínimo y máximo de usabilidad respecto de la dirección de entrega del cliente. Solo se consideran para el cálculo y la sugerencia los supermercados dentro de ese rango; fuera de él, un comercio no compite aunque tenga mejor precio. El mismo radio es el criterio que determina qué repartidores son elegibles para tomar un pedido (ver [Panel de repartidor](#módulos-incluidos)).
+* **Costo logístico de dividir la compra:** cuando la compra se reparte entre *n* comercios, el costo de envío no crece de forma lineal con *n*, sino según la función `P(n) = P₀ + k·(n−1)^2.5`, donde `P₀` es el costo base de envío con un solo comercio y `k` un coeficiente de ajuste (fórmula y ejemplo numérico detallados en [Función precio envío](funcion-precio-envio.pdf)). El exponente 2.5 hace que 1 o 2 comercios tengan un costo razonable, 3 ya implique un salto notorio, y de 4 en adelante el costo crezca fuertemente, desincentivando dividir la compra en demasiados puntos de origen sin necesidad de reglas adicionales por distancia. Los valores de `P₀` y `k` se definen por tamaño de envío (ver más abajo) y se usan tanto para el fee de envío estándar como para el recargo por combinación menos eficiente (ver [Modelo de negocio](#5.-modelo-de-negocio)).
+* **Tamaño de envío:** existen tres coeficientes de `P₀`/`k` distintos según el envío sea pequeño, mediano o grande, ya que cada tamaño requiere transporte y tiempos de entrega diferentes; el exponente 2.5 se mantiene igual entre los tres.
 
 El detalle técnico de cómo se calcula la recomendación (algoritmo, estructuras de datos, complejidad) se define en la documentación técnica de arquitectura, no en este documento funcional.
 
@@ -185,9 +192,13 @@ La plataforma no depende de una única fuente de ingresos. El uso básico es gra
 
 El usuario que quiere una experiencia sin fricciones y con beneficios adicionales paga un abono periódico (mensual o anual, con descuento por anualidad).
 
-Beneficios a definir para el plan Premium (a modo de propuesta, para validar): sin publicidad; envío gratis o con descuento fijo por período (ej. "3 envíos bonificados por mes"); prioridad en la asignación de repartidor en horarios pico; acceso anticipado o exclusivo a promociones de determinados supermercados.
+Beneficios a definir para el plan Premium (a modo de propuesta, para validar): sin publicidad (pero sí ve promociones, ver más abajo); envío gratis hasta 2 locales por compra, condicionado al nivel de fidelidad del usuario (ver "Niveles de usuario" más abajo); prioridad en la asignación de repartidor en horarios pico; acceso anticipado o exclusivo a promociones de determinados supermercados.
 
-Reglas de negocio: el beneficio de envío bonificado debe tener un tope mensual claro, para que no se transforme en una pérdida operativa; la suscripción es a nivel de cuenta de cliente, no de compra puntual; debe poder cancelarse en cualquier momento, con el beneficio activo hasta el fin del período ya pagado.
+Reglas de negocio: el beneficio de envío gratis hasta 2 locales aplica solo a partir de cierto nivel de fidelidad (por ejemplo, compras seguidas o volumen acumulado), no está disponible desde el primer mes de suscripción por igual para todos los usuarios Premium; la suscripción es a nivel de cuenta de cliente, no de compra puntual; debe poder cancelarse en cualquier momento, con el beneficio activo hasta el fin del período ya pagado.
+
+**Niveles de usuario y de supermercado**
+
+Tanto los clientes como los supermercados progresan por niveles según su comportamiento en la plataforma (para el cliente: compras seguidas, fidelidad, puntos acumulados; para el supermercado: cumplimiento de tiempos de preparación, actualización periódica de catálogo). El nivel es el mecanismo que habilita beneficios crecientes en ambos lados: en el cliente, determina hasta qué punto se bonifica el envío dentro del plan Premium y cuántos puntos otorga cada compra; en el supermercado, reemplaza y formaliza las "condiciones preferenciales por buen desempeño" mencionadas en la sección de beneficios (ver [7. Beneficios e incentivos por actor](#7.-beneficios-e-incentivos-por-actor)), como reducción de comisión o mejor posicionamiento por mérito en las búsquedas.
 
 Restricción: el valor de la suscripción tiene que calibrarse contra el costo real del envío, porque si el beneficio de "envíos bonificados" es más generoso de lo que cubre el abono, la suscripción da pérdida por usuario activo.
 
@@ -195,7 +206,7 @@ Restricción: el valor de la suscripción tiene que calibrarse contra el costo r
 
 Cada compra concretada a través de la plataforma genera un ingreso por comisión, independientemente de si el usuario es free o premium. Hay dos caminos posibles, no excluyentes:
 
-* **Comisión al supermercado:** un porcentaje sobre el valor de la venta, similar a como cobran los marketplaces tradicionales a sus comercios adheridos. Es el modelo más común y el que menos fricción genera con el cliente final.
+* **Comisión al supermercado:** un fee sobre el total de la compra, deliberadamente bajo, similar a como cobran los marketplaces tradicionales a sus comercios adheridos. El modelo apuesta a maximizar la cantidad de ventas concretadas en la plataforma antes que a cobrar una comisión alta por venta. Es el modelo más común y el que menos fricción genera con el cliente final.
 * **Fee de envío al cliente:** un costo fijo o variable por el servicio de logística/reparto, cobrado al cliente en el checkout, independiente del precio de los productos.
 
 Reglas de negocio: si se opta por comisión al supermercado, debe quedar claramente pactada en el acuerdo de adhesión (porcentaje fijo, o escalonado según volumen de ventas); el fee de envío al cliente, si existe, debe mostrarse de forma transparente antes de confirmar la compra, nunca como costo oculto; los usuarios Premium podrían tener condiciones preferenciales sobre este fee, pero la comisión al supermercado se mantiene igual sin importar el tipo de cliente que compró.
@@ -206,15 +217,21 @@ Restricción: si se cobra comisión al supermercado, eso puede desincentivar la 
 
 Como se detalla en el [motor de optimización](#4.-el-motor-de-optimización), el sistema siempre sugiere una combinación de comercios que considera óptima, pero el usuario puede comprar de la forma que prefiera. Cuando la elección del usuario implica un costo logístico real superior al de la opción recomendada, ese costo adicional se traslada al usuario en forma de recargo.
 
-Reglas de negocio: el recargo debe reflejar el costo real incremental de reparto (cada origen adicional implica una parada más, no es un cargo arbitrario), para que sea defendible ante el usuario como "esto sale más caro porque hay más logística involucrada", no como una penalización; el sistema debe mostrar el recargo antes de que el usuario confirme su elección, comparándolo contra la opción recomendada, para que la decisión sea informada; los usuarios Premium podrían tener este recargo bonificado o reducido.
+El recargo se calcula con la misma función de costo logístico definida en la sección anterior, `P(n) = P₀ + k·(n−1)^2.5` (con `P₀`/`k` según el tamaño de envío correspondiente): es la diferencia entre el `P(n)` de la combinación que el usuario eligió y el `P(n)` de la combinación recomendada por el optimizador.
+
+Reglas de negocio: el recargo debe reflejar el costo real incremental de reparto según esa fórmula, no un cargo arbitrario, para que sea defendible ante el usuario como "esto sale más caro porque hay más logística involucrada", no como una penalización; el sistema debe mostrar el recargo antes de que el usuario confirme su elección, comparándolo contra la opción recomendada, para que la decisión sea informada; los usuarios Premium podrían tener este recargo bonificado o reducido.
 
 Restricción: este ingreso depende de que el usuario elija activamente una opción subóptima, por lo que no puede proyectarse como una fuente de ingreso principal ni predecible; es más un mecanismo de balance de costos que una línea de negocio fuerte.
 
 **4\. Publicidad en la versión gratuita (ingreso indirecto, lado anunciante)**
 
-Los usuarios que no pagan suscripción ven espacios publicitarios dentro de la plataforma, financiados por anunciantes. Posibles anunciantes (a validar cuál o cuáles aplican): los propios supermercados adheridos, que pagan por destacar sus productos o su marca; marcas de productos (proveedores), interesadas en visibilidad dentro del catálogo; publicidad genérica de terceros no relacionados al rubro (menos recomendable).
+Los usuarios que no pagan suscripción ven espacios publicitarios dentro de la plataforma, financiados por anunciantes. No se acepta publicidad de terceros ajenos al rubro; los únicos anunciantes posibles son los propios supermercados adheridos, que pagan por destacar sus productos o su marca, y marcas de productos (proveedores) interesadas en visibilidad dentro del catálogo.
 
-Reglas de negocio: la publicidad no puede alterar ni mezclarse con el resultado del motor de comparación de precios; si un supermercado pudiera "pagar para aparecer más barato" o para posicionarse por encima de una opción más conveniente sin distinción visual clara, se rompe la confianza del usuario en la herramienta. Todo contenido patrocinado debe estar etiquetado como tal, de forma visible. Los usuarios Premium no ven publicidad, lo cual refuerza el valor de la suscripción.
+Se distingue explícitamente entre **publicidad** (espacio pago que promociona una marca o un comercio sin relación directa con lo que el usuario buscó) y **promociones** (descuentos u ofertas concretas de un supermercado sobre productos, visibles en el flujo de compra). Los usuarios Premium no ven publicidad, pero sí ven promociones, ya que estas aportan valor directo a la decisión de compra en lugar de ser solo un espacio comercial.
+
+Un caso particular de espacio pago es el posicionamiento en los resultados de búsqueda: de una lista de sugerencias, la mitad de las posiciones se asigna por pago (permitiendo la competencia entre los grandes supermercados por aparecer destacados) y la otra mitad se asigna de forma "orgánica", dando prioridad a los comercios que actualizan su stock y precios en la plataforma de manera periódica (ver también "Niveles de usuario y de supermercado" más arriba y [7. Beneficios e incentivos por actor](#7.-beneficios-e-incentivos-por-actor)).
+
+Reglas de negocio: la publicidad no puede alterar ni mezclarse con el resultado del motor de comparación de precios; si un supermercado pudiera "pagar para aparecer más barato" o para posicionarse por encima de una opción más conveniente sin distinción visual clara, se rompe la confianza del usuario en la herramienta. Todo contenido patrocinado (publicidad o posicionamiento pago en búsqueda) debe estar etiquetado como tal, de forma visible.
 
 Restricción: este ingreso depende de una base de usuarios activa considerable para ser atractivo a anunciantes, por lo que en las primeras etapas del producto probablemente no sea una fuente relevante de ingresos, sino una que madura con la escala.
 
@@ -236,7 +253,7 @@ Restricción: este ingreso depende de una base de usuarios activa considerable p
 
 **Panel de supermercado:** ABM de productos, actualización de precios, stock y bandeja de pedidos entrantes con cambio de estado de preparación.
 
-**Panel de repartidor:** Listado de tareas asignadas, registro de retiro en cada comercio y confirmación de entrega.
+**Panel de repartidor:** Listado de tareas asignadas, registro de retiro en cada comercio y confirmación de entrega. La asignación de un pedido a un repartidor usa el mismo radio de cobertura definido para sugerir comercios (ver [Motor de optimización](#4.-el-motor-de-optimización)): solo se consideran elegibles los repartidores dentro de ese rango respecto de los puntos de retiro y entrega.
 
 **Administración:** Gestión de usuarios y roles, alta de comercios y sucursales, definición de zonas de cobertura y costos de envío.
 
@@ -267,19 +284,20 @@ Más allá de la funcionalidad base descripta en cada rol (sección [2](#2.-acto
 **Cliente**
 
 * Cupones o descuentos por uso recurrente de la app, más allá de una promoción puntual de un comercio.
-* Programa de puntos o cashback acumulable por compra, canjeable en futuras compras o contra el fee de envío.
+* Programa de puntos por niveles: se acumulan puntos por compra y el nivel alcanzado habilita beneficios crecientes (envío bonificado, prioridad de repartidor, promociones exclusivas); no funciona como cashback canjeable por dinero o directamente contra el fee de envío.
 * Reporte periódico de "cuánto ahorraste este mes usando Changuito", para reforzar el valor percibido de la herramienta.
 * Beneficio por referidos: descuento tanto para quien invita como para quien se suma.
 * Alertas de bajada de precio en productos de listas guardadas o frecuentes.
-* Beneficios del plan Premium ya definidos en el [modelo de negocio](#5.-modelo-de-negocio) (sin publicidad, envíos bonificados, prioridad de repartidor, acceso anticipado a promociones).
+* Beneficios del plan Premium ya definidos en el [modelo de negocio](#5.-modelo-de-negocio) (sin publicidad pero con promociones, envío gratis hasta 2 locales según nivel de fidelidad, prioridad de repartidor, acceso anticipado a promociones).
 
 **Supermercado**
 
-* Visibilidad o posicionamiento destacado en resultados de búsqueda (el espacio pago ya está descripto como fuente de ingreso en el modelo de negocio; aquí se enmarca además como beneficio para el comercio, no solo como ingreso de la plataforma).
+* Visibilidad o posicionamiento destacado en resultados de búsqueda: la mitad de las posiciones en un listado de sugerencias es pago (compite entre los grandes supermercados), y la otra mitad es orgánica, priorizando a los comercios que mantienen su catálogo actualizado con mayor periodicidad (ver [Modelo de negocio](#5.-modelo-de-negocio)).
 * Acceso a métricas de demanda agregada: qué productos se buscan y no encuentran en su catálogo, qué categorías generan más comparaciones en su zona.
 * Canal de venta adicional sin necesidad de invertir en desarrollar un e-commerce propio, especialmente relevante para comercios que se integran por Modalidad 1 o 2\.
 * Posibilidad de lanzar promociones o descuentos exclusivos dentro de la plataforma, visibles para todos los usuarios o solo para usuarios Premium.
-* Condiciones preferenciales (por ejemplo, reducción de comisión) por buen desempeño sostenido: catálogo siempre actualizado, cumplimiento de tiempos de preparación.
+* Condiciones preferenciales por nivel de desempeño sostenido (catálogo siempre actualizado, cumplimiento de tiempos de preparación): reducción de comisión y mejor posicionamiento orgánico en búsquedas (ver "Niveles de usuario y de supermercado" en el [modelo de negocio](#5.-modelo-de-negocio)).
+* Beneficios por integración temprana: durante los primeros N meses desde la adhesión, publicidad o posicionamiento destacado sin costo y/o condiciones preferenciales de comisión, para aumentar el atractivo de sumarse a la plataforma frente a la competencia entre grandes cadenas.
 
 **Repartidor**
 
@@ -330,7 +348,7 @@ El tiempo de cursada no alcanza para implementar el producto completo descripto 
 
 La confianza en la plataforma depende de que el precio mostrado sea el precio real, y la actualización queda en manos de cada comercio a través de alguna de las tres modalidades de integración. Una falla o inconsistencia en la carga (planilla mal cargada, un mapeo que deja de coincidir con el archivo exportado, un evento de integración directa que no llega o llega corrupto) genera un precio o stock desactualizado: esto produce una recomendación incorrecta del optimizador y, en un escenario de compra dividido, puede tirar abajo el pedido en un comercio y arrastrar al resto de los comercios y al repartidor involucrados.
 
-**Mitigación:** fecha de última actualización visible por producto; alertas al comercio ante catálogos sin modificar por sobre la frecuencia mínima esperada; validación de formato estricta en la Modalidad 1 y de estructura en la Modalidad 2 antes de aceptar una carga; auditoría de eventos en la Modalidad 3 y suspensión preventiva de la integración automática ante fallas repetidas; política explícita de qué pasa si el precio o el stock cambian entre que se muestra al usuario y se confirma la compra (se respeta el precio mostrado al momento de la confirmación).
+**Mitigación:** fecha de última actualización visible por producto; alertas al comercio ante catálogos sin modificar por sobre la frecuencia mínima esperada; validación de formato estricta en la Modalidad 1 y de estructura en la Modalidad 2 antes de aceptar una carga; auditoría de eventos en la Modalidad 3 y suspensión preventiva de la integración automática ante fallas repetidas; política explícita de qué pasa si el precio o el stock cambian entre que se muestra al usuario y se confirma la compra (se respeta el precio mostrado al momento de la confirmación); acuerdo de adhesión que defina de antemano cómo se amortiguan los costos o reclamos cuando un precio o stock desactualizado del comercio afecta a una compra ya confirmada, en lugar de resolverlo caso por caso.
 
 ### 9.2 Riesgos de negocio {#92-riesgos-de-negocio}
 
@@ -394,3 +412,4 @@ A esto se suma que el despliegue de PHP es sencillo en cualquier hosting compart
 Sobre once semanas de cursada restantes, el trabajo se distribuye entre los tres integrantes del equipo, con seguimiento de tareas y tiempos por entrega.
 
 [aquí insertar referencia a tablero de gestión de tareas y tiempos]
+</content>
