@@ -30,6 +30,10 @@ Abrí [http://localhost:3000](http://localhost:3000).
 
 Ver `content/como-agregar-documentacion.md` (disponible también en el sitio) para la guía completa.
 
+## Referencias privadas (`private-context/`)
+
+Apuntes crudos, borradores o material que se usa como insumo para redactar documentación (por ejemplo, contexto para que una IA genere o actualice un doc) van en `private-context/`, en la raíz del repo — **no** en `content/`. La app nunca lee esa carpeta: no genera páginas, no aparece en el sidebar ni en la búsqueda. Es solo almacenamiento versionado en el repo (que ya es privado), separado de lo que se publica en el sitio.
+
 ## Cómo funciona
 
 - `lib/docs.ts`: lee `content/*.{md,pdf,html}`, arma metadata (título, orden, tipo) y expone el índice de navegación.

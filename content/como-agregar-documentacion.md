@@ -14,11 +14,13 @@ content/
 ├── como-agregar-documentacion.md   ← este archivo
 ├── propuesta-general.md
 ├── trabajo-practico-integrador.md
-├── mejoras.md
-└── funcion-precio-envio.pdf
+├── funcion-precio-envio.pdf
+└── modelo-de-negocio-slides.html
 ```
 
 **Nombre del archivo:** usá minúsculas, sin espacios ni acentos, separando palabras con guiones (`kebab-case`). Ese nombre es el que va a aparecer en la URL, así que conviene que sea corto y descriptivo (ej. `plan-de-envios.md`, no `Plan de Envíos (v2 final).md`).
+
+**Importante:** todo lo que pongas en `content/` es público para cualquiera con acceso al sitio. Apuntes crudos, borradores o material que solo sirve como insumo interno (por ejemplo, para generar documentación con una IA) van en `private-context/`, no en `content/` — ver la sección 9.
 
 ## 2. Front-matter (metadata del documento)
 
@@ -89,10 +91,19 @@ No hace falta ninguna configuración extra: el buscador indexa automáticamente 
 
 El botón de tema (arriba a la derecha, junto al buscador) alterna entre modo claro y oscuro y guarda la preferencia del usuario en el navegador (`localStorage`). Si el visitante nunca lo tocó, la app respeta el tema del sistema operativo. No requiere ninguna acción al agregar documentos: todos los estilos (`prose`, sidebar, buscador) ya soportan ambos modos.
 
-## 8. Resumen rápido
+## 9. Referencias privadas (`private-context/`)
 
-1. Creá `content/mi-documento.<md|pdf|html>` con nombre en `kebab-case`.
-2. Si es Markdown, agregá front-matter con `title` (y `order` si querés fijar su posición).
+No todo lo que se escribe es documentación terminada. Notas sueltas, apuntes de una reunión, borradores o material que le damos de contexto a una IA para redactar o actualizar un documento van en la carpeta `private-context/`, en la raíz del repo (al lado de `content/`, no adentro).
+
+- La app **nunca** lee `private-context/`: no genera páginas, no aparece en el sidebar, no se indexa en la búsqueda. Es simple almacenamiento en el repo, no documentación publicada.
+- No tiene convenciones de formato ni front-matter — es una carpeta de trabajo, no algo que se renderiza.
+- Un ejemplo real: `private-context/mejoras.md` son los apuntes crudos que se usaron para escribir la sección de modelo de negocio de `content/propuesta-general.md`.
+- Si un apunte de ahí termina consolidado en un doc público, podés dejarlo igual como registro de la fuente.
+
+## 10. Resumen rápido
+
+1. ¿Es documentación terminada para cualquiera con acceso al sitio? Va en `content/mi-documento.<md|pdf|html>`, con nombre en `kebab-case`. ¿Es un apunte crudo o contexto interno? Va en `private-context/`.
+2. Si es Markdown en `content/`, agregá front-matter con `title` (y `order` si querés fijar su posición).
 3. Escribí el contenido en Markdown/GFM, con un `#`/`##` por sección — o dejá el PDF/HTML tal cual.
 4. Para linkear otro doc, usá `[texto](otro-doc.md)`, `[texto](otro-doc.pdf)` o `[texto](otro-doc.html)`.
 5. Corré `npm run dev` para revisar cómo queda antes de commitear.

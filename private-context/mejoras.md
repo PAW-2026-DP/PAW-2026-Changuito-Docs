@@ -1,7 +1,6 @@
----
-title: "Mejoras y Modelo de Negocio"
-order: 3
----
+# Mejoras y modelo de negocio (notas crudas)
+
+> Referencia interna: apuntes sin pulir usados para redactar `content/propuesta-general.md`. No es documentación final, no se publica en el sitio.
 
 - Acuerdos entre supermercado y negocio en cuanto a terminos y condiciones por precios desactualizados y amortiguacion de costos.
 - Beneficios por integracion temprana los primeros N meses para incentivar a los supermercados a adherirse.
