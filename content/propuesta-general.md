@@ -94,7 +94,7 @@ Reglas de negocio:
 
 * El supermercado es responsable de que la información cargada (precios, stock, descripciones) sea correcta y esté vigente. La plataforma no valida veracidad, solo formato.
 * Toda carga reemplaza o actualiza el catálogo existente; no hay versión "borrador" en esta modalidad, la actualización es de todo o nada por archivo subido.
-* Se debe definir una frecuencia mínima de actualización esperada (por ejemplo, al menos una vez por semana), ya que precios desactualizados afectan directamente al motor de comparación y optimización de compra, y podrían perjudicar al cliente final.
+* La frecuencia mínima de actualización esperada es de al menos una vez por semana, ya que precios desactualizados afectan directamente al motor de comparación y optimización de compra, y perjudican al cliente final.
 * Si la planilla no respeta el formato exigido, la carga se rechaza en su totalidad y se le informa al supermercado qué corregir. No se aceptan cargas parciales con errores.
 * Es responsabilidad del supermercado dar de baja del archivo aquellos productos que ya no comercializa; el sistema no elimina productos por su cuenta.
 
@@ -132,7 +132,7 @@ Reglas de negocio:
 * Debe existir un mecanismo de auditoría: quedar registro de cada actualización recibida por esta vía (qué se cambió, cuándo, y si se aplicó correctamente).
 * Ante fallas repetidas o inconsistencias sostenidas por parte de un supermercado en esta modalidad, la plataforma debe poder suspender preventivamente la integración automática y notificar al supermercado.
 
-Restricciones: exige que el supermercado cuente con capacidad técnica propia para implementar la conexión de su lado; es la modalidad de mayor exigencia de coordinación inicial entre ambas partes, por lo que conviene contemplar un período de habilitación/certificación antes de que el supermercado quede operativo en modo automático.
+Restricciones: exige que el supermercado cuente con capacidad técnica propia para implementar la conexión de su lado; es la modalidad de mayor exigencia de coordinación inicial entre ambas partes, por lo que el supermercado atraviesa un período de habilitación/certificación antes de quedar operativo en modo automático.
 
 **Regla transversal a las tres modalidades**
 
@@ -140,7 +140,7 @@ Independientemente de la modalidad elegida, la plataforma es la única fuente de
 
 El acuerdo de adhesión entre la plataforma y cada supermercado debe fijar de antemano términos y condiciones sobre qué ocurre cuando un precio o stock desactualizado del comercio provoca un problema en una compra ya confirmada (por ejemplo, un producto que se muestra disponible pero no lo está al momento del retiro): quién amortigua la diferencia de costo o el reclamo del cliente, y bajo qué condiciones. Esto evita que la disputa se resuelva caso por caso.
 
-Para incentivar la adhesión temprana de comercios, se contemplan beneficios durante los primeros N meses desde la integración (por ejemplo, comisión reducida o exposición destacada sin costo), a definir junto con el resto de beneficios por actor (ver [7. Beneficios e incentivos por actor](#7-beneficios-e-incentivos-por-actor)).
+Para incentivar la adhesión temprana de comercios, la plataforma otorga beneficios durante los primeros N meses desde la integración: comisión reducida y exposición destacada sin costo (ver [7. Beneficios e incentivos por actor](#7-beneficios-e-incentivos-por-actor)).
 
 ---
 
@@ -173,7 +173,7 @@ La plataforma no depende de una única fuente de ingresos. El uso básico es gra
 
 El usuario que quiere una experiencia sin fricciones y con beneficios adicionales paga un abono periódico (mensual o anual, con descuento por anualidad).
 
-Beneficios a definir para el plan Premium (a modo de propuesta, para validar): sin publicidad (pero sí ve promociones, ver más abajo); envío gratis hasta 2 locales por compra, condicionado al nivel de fidelidad del usuario (ver "Niveles de usuario y de supermercado" más abajo); prioridad en la asignación de repartidor en horarios pico; acceso anticipado o exclusivo a promociones de determinados supermercados.
+El plan Premium incluye: sin publicidad (pero sí ve promociones, ver más abajo); envío gratis hasta 2 locales por compra, condicionado al nivel de fidelidad del usuario (ver "Niveles de usuario y de supermercado" más abajo); prioridad en la asignación de repartidor en horarios pico; acceso anticipado o exclusivo a promociones de determinados supermercados.
 
 Reglas de negocio: el beneficio de envío gratis hasta 2 locales aplica solo a partir de cierto nivel de fidelidad (por ejemplo, compras seguidas o volumen acumulado), no está disponible desde el primer mes de suscripción por igual para todos los usuarios Premium; la suscripción es a nivel de cuenta de cliente, no de compra puntual; debe poder cancelarse en cualquier momento, con el beneficio activo hasta el fin del período ya pagado.
 
@@ -190,7 +190,7 @@ Cada compra concretada a través de la plataforma genera un ingreso por comisió
 * **Comisión al supermercado:** un fee sobre el total de la compra, deliberadamente bajo, similar a como cobran los marketplaces tradicionales a sus comercios adheridos. El modelo apuesta a maximizar la cantidad de ventas concretadas en la plataforma antes que a cobrar una comisión alta por venta. Es el modelo más común y el que menos fricción genera con el cliente final.
 * **Fee de envío al cliente:** un costo fijo o variable por el servicio de logística/reparto, cobrado al cliente en el checkout, independiente del precio de los productos.
 
-Reglas de negocio: si se opta por comisión al supermercado, debe quedar claramente pactada en el acuerdo de adhesión (porcentaje fijo, o escalonado según volumen de ventas); el fee de envío al cliente, si existe, debe mostrarse de forma transparente antes de confirmar la compra, nunca como costo oculto; los usuarios Premium podrían tener condiciones preferenciales sobre este fee, pero la comisión al supermercado se mantiene igual sin importar el tipo de cliente que compró.
+Reglas de negocio: la comisión al supermercado queda pactada en el acuerdo de adhesión (porcentaje fijo, o escalonado según volumen de ventas); el fee de envío al cliente se muestra de forma transparente antes de confirmar la compra, nunca como costo oculto; los usuarios Premium tienen condiciones preferenciales sobre este fee, pero la comisión al supermercado se mantiene igual sin importar el tipo de cliente que compró.
 
 Restricción: si se cobra comisión al supermercado, eso puede desincentivar la adhesión de comercios chicos con márgenes ajustados.
 
@@ -200,7 +200,7 @@ Como se detalla en el [motor de optimización](#4-el-motor-de-optimización), el
 
 El recargo se calcula con la misma función de costo logístico definida en la sección anterior, `P(n) = P₀ + k·(n−1)^2.5` (con `P₀`/`k` según el tamaño de envío correspondiente): es la diferencia entre el `P(n)` de la combinación que el usuario eligió y el `P(n)` de la combinación recomendada por el optimizador.
 
-Reglas de negocio: el recargo debe reflejar el costo real incremental de reparto según esa fórmula, no un cargo arbitrario, para que sea defendible ante el usuario como "esto sale más caro porque hay más logística involucrada", no como una penalización; el sistema debe mostrar el recargo antes de que el usuario confirme su elección, comparándolo contra la opción recomendada, para que la decisión sea informada; los usuarios Premium podrían tener este recargo bonificado o reducido.
+Reglas de negocio: el recargo refleja el costo real incremental de reparto según esa fórmula, no es un cargo arbitrario, de manera que resulte defendible ante el usuario como "esto sale más caro porque hay más logística involucrada", no como una penalización; el sistema muestra el recargo antes de que el usuario confirme su elección, comparándolo contra la opción recomendada, para que la decisión sea informada; los usuarios Premium tienen este recargo reducido.
 
 Restricción: este ingreso depende de que el usuario elija activamente una opción subóptima, por lo que no puede proyectarse como una fuente de ingreso principal ni predecible; es más un mecanismo de balance de costos que una línea de negocio fuerte.
 
@@ -214,7 +214,7 @@ Un caso particular de espacio pago es el posicionamiento en los resultados de b�
 
 Reglas de negocio: la publicidad no puede alterar ni mezclarse con el resultado del motor de comparación de precios; si un supermercado pudiera "pagar para aparecer más barato" o para posicionarse por encima de una opción más conveniente sin distinción visual clara, se rompe la confianza del usuario en la herramienta. Todo contenido patrocinado (publicidad o posicionamiento pago en búsqueda) debe estar etiquetado como tal, de forma visible.
 
-Restricción: este ingreso depende de una base de usuarios activa considerable para ser atractivo a anunciantes, por lo que en las primeras etapas del producto probablemente no sea una fuente relevante de ingresos, sino una que madura con la escala.
+Restricción: este ingreso depende de una base de usuarios activa considerable para ser atractivo a anunciantes; en las primeras etapas del producto no es una fuente relevante de ingresos, y madura con la escala.
 
 ---
 
@@ -260,7 +260,7 @@ Se excluyen explícitamente, por no aportar valor conceptual al proyecto o por e
 
 ## 7. Beneficios e incentivos por actor
 
-Más allá de la funcionalidad base descripta en cada rol (sección [2. Actores del sistema](#2-actores-del-sistema)), Changuito busca un diferencial concreto frente a comparadores o marketplaces existentes: cada actor tiene una razón activa para preferir la plataforma, no solo la posibilidad de usarla. Este apartado reúne un relevamiento amplio de propuestas de beneficios por actor, a modo de banco de ideas para luego decidir cuáles se adoptan como parte del producto (ver [8. Scope del trabajo práctico](#8-scope-del-trabajo-práctico)).
+Más allá de la funcionalidad base descripta en cada rol (sección [2. Actores del sistema](#2-actores-del-sistema)), Changuito ofrece un diferencial concreto frente a comparadores o marketplaces existentes: cada actor tiene una razón activa para preferir la plataforma, no solo la posibilidad de usarla. Este apartado detalla los beneficios que la plataforma otorga a cada actor; la sección [8. Scope del trabajo práctico](#8-scope-del-trabajo-práctico) define cuáles de ellos forman parte del Trabajo Práctico Integrador.
 
 **Cliente**
 
@@ -292,13 +292,13 @@ Más allá de la funcionalidad base descripta en cada rol (sección [2. Actores 
 
 * Panel de métricas globales de adopción, ahorro generado a los usuarios y volumen por comercio, útil como argumento comercial para conseguir más comercios adheridos. Este beneficio es más una herramienta de gestión que un incentivo directo a un actor, pero se incluye porque sostiene la propuesta de valor frente a los demás.
 
-Esta lista es intencionalmente amplia; queda pendiente una instancia de curación con el equipo para decidir qué beneficios se adoptan como parte del producto real y cuáles se descartan.
+Esta es la lista completa de beneficios de la plataforma; la sección [8. Scope del trabajo práctico](#8-scope-del-trabajo-práctico) define cuáles se implementan en el Trabajo Práctico Integrador y cuáles quedan documentados a nivel producto para una etapa posterior.
 
 ---
 
 ## 8. Scope del trabajo práctico
 
-El tiempo de cursada no alcanza para implementar el producto completo descripto en este documento. Este apartado separa explícitamente qué se va a construir dentro del Trabajo Práctico Integrador de qué queda documentado a nivel producto, como base para un MVP a futuro fuera de la materia. El corte propuesto a continuación es una recomendación inicial del equipo, sujeta a ajuste y a lo que se acuerde con el equipo docente en cada entrega (tal como prevé el cronograma de la cátedra).
+El tiempo de cursada no alcanza para implementar el producto completo descripto en este documento. Este apartado separa explícitamente qué se construye dentro del Trabajo Práctico Integrador de qué queda documentado a nivel producto, como base para un MVP a futuro fuera de la materia.
 
 **Incluido en el TPI (mínimo funcional end-to-end):**
 
