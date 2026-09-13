@@ -363,7 +363,7 @@ Retirar en varios comercios y entregar en un único punto es más caro y más fr
 
 Se divide en tres sitemaps ya que se contará con tres páginas web, cada una orientada a los perfiles y roles del negocio. Se contará con una app de gestión, una de logística y la aplicación final de cara al cliente.
 
-[aquí insertar referencia a diagrama de sitemap]
+https://app.diagrams.net/#G1O-L8HVnFP8NCRYejGcBwjPALR3OmM801#%7B%22pageId%22%3A%22cFvNSprKy6vy9Qq8t5Ss%22%7D
 
 ---
 
