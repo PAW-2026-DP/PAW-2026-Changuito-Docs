@@ -7,6 +7,9 @@ order: 3
 
 Diagrama Entidad-Relación consolidado de Changuito (in scope del TPI y backlog de producto).
 
+https://mermaid.ai/d/14f2d69a-a253-455e-a634-619026ceba2f
+
+
 ```mermaid
 erDiagram
     Usuario {
