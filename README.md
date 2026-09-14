@@ -2,6 +2,46 @@
 
 Aplicación web (Next.js) que centraliza la documentación del proyecto **Changuito**: permite leer documentos Markdown, PDF y HTML desde el navegador, navegar entre ellos y buscar referencias. Soporta modo oscuro/claro.
 
+---
+
+## Mapa del proyecto
+
+**Changuito** es el Trabajo Práctico Integrador de Programación en Ambiente Web (UNLu, 2026).
+**Integrantes:** Rodriguez Juan Cruz, Ponti Mateo Daniel, Ortiz María Agustina.
+
+### Repositorios
+
+| Repositorio | Contenido |
+| :---- | :---- |
+| [Changuito-Docs](https://github.com/PAW-2026-DP/PAW-2026-Changuito-Docs) | Documentación del proyecto (este repositorio). Publicada en https://paw-2026-changuito-docs.vercel.app/ |
+| [Changuito-fn](https://github.com/PAW-2026-DP/PAW-2026-Changuito-fn) | Frontend del cliente |
+| [Changuito-Backoffice-fn](https://github.com/PAW-2026-DP/PAW-2026-Changuito-Backoffice-fn) | Frontend de gestión: supermercados y administración |
+| [Changuito-Riders-fn](https://github.com/PAW-2026-DP/PAW-2026-Changuito-Riders-fn) | Frontend de repartidores |
+| [Changuito-bn](https://github.com/PAW-2026-DP/PAW-2026-Changuito-bn) | Backend: API en PHP y base de datos MySQL / MariaDB |
+
+> El repositorio **PAW-2026-PAWPrints-fn**, que está en esta misma organización, corresponde a un trabajo práctico individual de la cursada y **no forma parte del TP Integrador**.
+
+### Dónde está cada cosa
+
+| Artefacto | Ubicación |
+| :---- | :---- |
+| Propuesta general, presupuesto y sitemaps | [Propuesta General](https://paw-2026-changuito-docs.vercel.app/docs/propuesta-general) |
+| Arquitectura de la aplicación | [Arquitectura](https://paw-2026-changuito-docs.vercel.app/docs/changuito-arquitectura) y diagrama C4, niveles 1 a 3 |
+| Modelo de objetos y diagrama entidad-relación | [Modelo de Objetos](https://paw-2026-changuito-docs.vercel.app/docs/modelo-de-objetos) y diagrama C4, nivel 4 |
+| Alcance propuesto para la 3ra entrega | [Alcance 3ra Entrega](https://paw-2026-changuito-docs.vercel.app/docs/propuesta-entrega-3) |
+| Wireframes | Figma, enlazado desde el README de cada frontend |
+| Fuentes de los diagramas | `diagrams/` en este repositorio (`.drawio`) |
+| Seguimiento de tareas | Linear, enlazado desde la propuesta general |
+
+### Entregas
+
+| Entrega | Tag | Contenido |
+| :---- | :---- | :---- |
+| 1ra | `v1.0.0` | Propuesta general y sitemaps |
+| 2da | `v2.0.0` | Wireframes, arquitectura y modelo de objetos |
+
+---
+
 ## Correr en local
 
 ```bash
@@ -32,7 +72,7 @@ Ver `content/como-agregar-documentacion.md` (disponible también en el sitio) pa
 
 ## Referencias privadas (`private-context/`)
 
-Apuntes crudos, borradores o material que se usa como insumo para redactar documentación (por ejemplo, contexto para que una IA genere o actualice un doc) van en `private-context/`, en la raíz del repo — **no** en `content/`. La app nunca lee esa carpeta: no genera páginas, no aparece en el sidebar ni en la búsqueda. Es solo almacenamiento versionado en el repo (que ya es privado), separado de lo que se publica en el sitio.
+Apuntes crudos, borradores o material que se usa como insumo para redactar documentación (por ejemplo, contexto para que una IA genere o actualice un doc) van en `private-context/`, en la raíz del repo — **no** en `content/`. La app nunca lee esa carpeta: no genera páginas, no aparece en el sidebar ni en la búsqueda. Es solo almacenamiento versionado en el repo (que es público, así que no debe contener información sensible), separado de lo que se publica en el sitio.
 
 ## Cómo funciona
 

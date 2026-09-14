@@ -11,12 +11,13 @@ order: 1
 
 **Repositorios:**
 
-* [TPI - Frontend](https://github.com/PAW-2026-DP/PAW-2026-Changuito-fn)
-* [TPI - Backoffice - Frontend](https://github.com/PAW-2026-DP/PAW-2026-Changuito-Backoffice-fn)
-* [TPI - Riders - Frontend](https://github.com/PAW-2026-DP/PAW-2026-Changuito-Riders-fn)
-* [TPI - Backend](https://github.com/jbrodi99/PAW-2026-TPI-bn)
+* [Documentación](https://github.com/PAW-2026-DP/PAW-2026-Changuito-Docs)
+* [TPI - Frontend Cliente](https://github.com/PAW-2026-DP/PAW-2026-Changuito-fn)
+* [TPI - Frontend Backoffice](https://github.com/PAW-2026-DP/PAW-2026-Changuito-Backoffice-fn)
+* [TPI - Frontend Riders](https://github.com/PAW-2026-DP/PAW-2026-Changuito-Riders-fn)
+* [TPI - Backend](https://github.com/PAW-2026-DP/PAW-2026-Changuito-bn)
 
-**Tag de esta entrega:** v1.0.0
+**Tags de entrega:** `v1.0.0` (1ra entrega) · `v2.0.0` (2da entrega)
 
 ---
 
